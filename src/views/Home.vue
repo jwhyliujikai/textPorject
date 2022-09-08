@@ -53,7 +53,7 @@ export default defineComponent({
       peopleMsg.value.addEventListener('scroll', addEventListenerHandle)
       setTimeout(() => {
         getDataList()
-      }, 1000)
+      }, 2000)
     })
     const searchHandle = () => {
       message.dataList = []

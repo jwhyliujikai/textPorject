@@ -1,9 +1,9 @@
 <template>
-  <div class="a"></div>
-  <div class="c"></div>
-  <div class="b"></div>
-  <div class="a"></div>
-  <div class="b"></div>
+  <div class="a ant-skeleton-title"></div>
+  <div class="c ant-skeleton-title"></div>
+  <div class="b ant-skeleton-title"></div>
+  <div class="a ant-skeleton-title"></div>
+  <div class="b ant-skeleton-title"></div>
 </template>
 
 <script lang="ts">
@@ -33,5 +33,18 @@ export default defineComponent({
   height: 60px;
   width: 50%;
   background: #ccc;
+}
+.ant-skeleton-title {
+  background: linear-gradient(90deg, #f2f2f2 25%, #e6e6e6 37%, #f2f2f2 63%);
+  background-size: 400% 100%;
+  animation: ant-skeleton-loading 1.4s ease infinite;
+}
+@keyframes ant-skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 </style>
