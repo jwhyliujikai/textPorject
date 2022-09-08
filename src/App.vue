@@ -1,7 +1,9 @@
 <template>
+<!-- vue2中的html模板中必须有一对跟标签，vue3组件的html模板中可以没有跟标签 -->
   <div id="nav">
     <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <router-link to="/about">About</router-link> |
+    <router-link to="/Setup">Setup</router-link>
   </div>
   <router-view/>
 </template>
