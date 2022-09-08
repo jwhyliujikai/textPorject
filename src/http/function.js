@@ -1,7 +1,6 @@
 /**
  * 请求相关的配置函数
  * @file 请求库工具函数封装
- * @author author-name(李红波 15537053107)
  */
 
 import {

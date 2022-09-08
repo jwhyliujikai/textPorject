@@ -1,7 +1,6 @@
 /**
  * 请求库的拦截器配置
  * @file 请求库拦截器封装
- * @author author-name(李红波 15537053107)
  */
 
 import * as fn from './function'

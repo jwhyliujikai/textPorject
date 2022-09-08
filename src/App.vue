@@ -1,12 +1,24 @@
 <template>
 <!-- vue2中的html模板中必须有一对跟标签，vue3组件的html模板中可以没有跟标签 -->
   <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/Setup">Setup</router-link>
   </div>
   <router-view/>
 </template>
+<script>
+import { defineComponent } from 'vue'
+import Home from '@/views/Home.vue'
+
+export default defineComponent({
+  name: 'Home',
+  components: {
+    // 注册一个子组件
+    // Home,
+  },
+  setup() {
+    
+  },
+})
+</script>
 
 <style>
 #app {
@@ -18,7 +30,7 @@
 }
 
 #nav {
-  padding: 30px;
+  /* padding: 30px; */
 }
 
 #nav a {

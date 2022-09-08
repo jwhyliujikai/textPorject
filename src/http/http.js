@@ -1,7 +1,6 @@
 /**
  * 请求库的配置
  * @file 底层请求库封装
- * @author author-name(李红波 15537053107)
  */
 
 import axios from 'axios'

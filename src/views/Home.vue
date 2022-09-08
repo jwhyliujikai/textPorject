@@ -1,16 +1,17 @@
 <template>
-  <div class="home">
-    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />11
-    <!-- <embed src="@/svg/1.svg" type="image/svg+xml" /> -->
-    <svg class="svgImg" id="军人" xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90">
-      <g id="军人-2" data-name="军人" transform="translate(12.283 6.75)">
-        <path id="形状" class="cls-1"
-          d="M64.684,76.5H1.5A1.5,1.5,0,0,1,.022,74.743L4.574,48.551A1.505,1.505,0,0,1,5.661,47.36L19.2,43.708l11.343-3.061A13.419,13.419,0,0,1,24.787,38,15.933,15.933,0,0,1,20.658,33.1a18.775,18.775,0,0,1-2.248-7.625,19.152,19.152,0,0,1,1.236-8.32l-6.07-5.735a3.034,3.034,0,0,1-.653-2.376,3.105,3.105,0,0,1,1.317-2.111A38.808,38.808,0,0,1,32.389.009C32.514,0,32.646,0,32.783,0a26.53,26.53,0,0,1,7.791,1.583A44.576,44.576,0,0,1,51.258,6.932a3.1,3.1,0,0,1,1.317,2.11,3.032,3.032,0,0,1-.654,2.377l-.108.117-5.661,5.337a19.034,19.034,0,0,1-.785,16.005,16.024,16.024,0,0,1-4.079,5,13.47,13.47,0,0,1-5.757,2.744l10.982,2.963,14.009,3.779a1.5,1.5,0,0,1,1.087,1.191l4.552,26.191A1.5,1.5,0,0,1,64.684,76.5ZM46.047,45.958h0L40.522,74.083H63.605L59.343,49.546l-13.3-3.588ZM34.841,46.972l2.932,27.111h.3L43.72,45.33,33.092,42.464,22.054,45.442,28.5,74.083h.367l2.325-27.111h3.652Zm-15.111-.9L6.842,49.546,2.578,74.083H26.033ZM21.619,18.8a16.691,16.691,0,0,0-.855,5.251c0,7.957,5.468,14.431,12.189,14.431s12.188-6.474,12.188-14.431a16.615,16.615,0,0,0-.944-5.492.283.283,0,0,0-.039.036.274.274,0,0,1-.042.039A20.939,20.939,0,0,1,32.5,22.4,18.463,18.463,0,0,1,21.619,18.8Zm3.412-.7a15.527,15.527,0,0,0,7.39,1.884A17.867,17.867,0,0,0,40.2,18.094Zm15.174,0h.03c.082-.077.588-.5,1.355-1.131,2.813-2.329,8.666-7.175,8.607-7.57s-2.114-1.909-5.33-3.455A37.449,37.449,0,0,0,32.934,2.422c-3.886,0-8.723,1.921-11.261,3.066C17.96,7.164,15.38,8.859,15.3,9.391c-.057.407,5.952,5.5,8.518,7.67l0,0c.618.523,1.064.9,1.183,1.008H40.244l-.032.015Z" />
-        <path id="形状-2" data-name="形状" class="cls-2" d="M12.629,10.465H0V7.5H12.629v2.964ZM6.28,4c-2.222,0-4.03-.9-4.03-2S4.058,0,6.28,0s4.03.9,4.03,2S8.5,4,6.28,4Z" transform="translate(25.967 4.5)" />
-      </g>
-    </svg>
-    <img src="@/svg/1.svg" alt="">
+  <div class="out">
+    <div class="content">
+      <div class="head"><input type="text" v-model='message.formValue' /><button @click="searchHandle" title="例如输入 32761060，可以查出第一条数据">查询</button></div>
+      <div class="people-msg" ref="peopleMsg">
+        <ul class="ul-style" ref="ulStyle">
+          <li class="li-style" v-for="(item, i) in message.dataList" :key="i" @click="toDetail(item)">{{i}}----{{item.title}}</li>
+          <div v-if="message.showTip" class="no-data">没有更多信息了</div>
+        </ul>
+      </div>
+      <div class="loading" v-if="message.isShow">
+        <Skeleton />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -18,8 +19,10 @@
 // 这里可以写ts代码
 
 // defineComponent函数，目的是定义一个组件，内部可以传入一个配置对象
-import { defineComponent } from 'vue'
-import HelloWorld from '@/components/HelloWorld.vue' // @ is an alias to /src
+import { defineComponent, onMounted, ref, reactive } from 'vue'
+import Skeleton from '@/components/Skeleton.vue' // @ is an alias to /src
+import axios from 'axios'
+import { useRouter } from 'vue-router';
 // import svg from '@/svg/1.svg'
 // 暴露出去一个定义好的组件
 export default defineComponent({
@@ -28,18 +31,210 @@ export default defineComponent({
   // 注册组件
   components: {
     // 注册一个子组件
-    HelloWorld,
+    Skeleton,
   },
-  data() {
-    return {
-      // svg: svg
+  setup() {
+    const router = useRouter();
+    let objPage = {
+      title: 'hello',
+      dataList: [] as any[],
+      idList: [],
+      indexId: 1,
+      isShow: false,
+      formValue: '',
+      showTip: false,
+      oldDom: true
     }
-  },
+    const peopleMsg = ref()
+    const ulStyle = ref()
+    let message = reactive(objPage)
+    onMounted(() => {
+      console.log(peopleMsg.value, 'peopleMsgDom.value')
+      peopleMsg.value.addEventListener('scroll', addEventListenerHandle)
+      setTimeout(() => {
+        getDataList()
+      }, 1000)
+    })
+    const searchHandle = () => {
+      message.dataList = []
+      if (message.formValue) {
+        getNewList(message.formValue)
+      } else {
+        getDataList()
+      }
+    }
+    const getDataList = () => {
+      message.isShow = true
+      axios
+        .get('https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty')
+        .then(function (res) {
+          if (res.status === 200) {
+            message.idList = res.data
+            let params = message.idList.slice(0, 20)
+            try {
+              for (let i = 0; i < params.length; i++) {
+                getNewList(params[i])
+              }
+            } catch (err) {
+              message.isShow = false
+              console.log(err)
+            } finally {
+              message.isShow = false
+            }
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    }
+    // 监听滚动条是否到底部事件
+    const addEventListenerHandle = () => {
+      console.log(12, message.idList.length, message.dataList.length)
+      if (message.idList.length === message.dataList.length) {
+        message.showTip = true
+        return
+      }
+      const peopleMsgDom: any = peopleMsg.value
+      const ulStyleDom = ulStyle.value
+      peopleMsgDom.onscroll = () => {
+        let max = Math.ceil(ulStyleDom.scrollHeight - peopleMsgDom.scrollTop + 10) - peopleMsgDom.clientHeight
+        if (Math.abs(max) < 5) {
+          message.indexId += 1
+          console.log(message.indexId, 'this.indexId', message.idList)
+          let params = message.idList.slice(message.indexId * 10, (message.indexId + 1) * 10)
+          console.log('11133333', params)
+          for (let i = 0; i < params.length; i++) {
+            getNewList(params[i])
+          }
+        }
+      }
+    }
+    // 新闻请求
+    const getNewList = (id: string) => {
+      axios
+        .get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`)
+        .then(function (res) {
+          if (res.status === 200) {
+            message.oldDom = false
+            message.dataList.push(res.data)
+          }
+        })
+        .catch(function (error) {
+          console.log(error)
+        })
+    }
+    // 跳转详情
+    const toDetail = (msg: { id: any }) => {
+      router.push({
+        path: '/Detail',
+        query:{
+          id: msg.id
+        }
+      })
+    }
+    return {
+      message,
+      peopleMsg,
+      ulStyle,
+      searchHandle,
+      getNewList,
+      getDataList,
+      addEventListenerHandle,
+      toDetail
+    }
+  }
 })
 </script>
 <style lang="scss">
-  .svgImg{
-    width: 20px;
-    height: 20px;
-  }
+.out {
+  width: 1200px;
+  margin: 0 auto;
+}
+.head {
+  width: 400px;
+  /* border: 1px solid; */
+  display: flex;
+  justify-content: space-between;
+  margin: 12px auto;
+}
+input {
+  height: 24px;
+  border-color: #ccc;
+  width: 312px;
+  background-color: #fff;
+  background-image: none;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+  box-sizing: border-box;
+  color: #606266;
+  display: inline-block;
+  font-size: inherit;
+  height: 40px;
+  line-height: 40px;
+  outline: none;
+  padding: 0 15px;
+  transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+button {
+  color: #fff;
+  background-color: #409eff;
+  border-color: #409eff;
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  padding: 12px 20px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.people-msg {
+  width: 100%;
+  height: calc(100vh - 103px);
+  background: #f2f6fc;
+  overflow-y: auto;
+  /* z-index: 10; */
+}
+.ul-style {
+  width: 96%;
+  margin: 0;
+}
+.li-style {
+  width: 98%;
+  height: 100px;
+  border: 1px solid yellowgreen;
+  margin-top: 10px;
+  cursor: pointer;
+  z-index: 1;
+  border-radius: 5px;
+  padding: 5px;
+}
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.no-data {
+  text-align: center;
+  color: #ccc;
+}
+
+.content {
+  position: relative;
+}
+.loading {
+  position: absolute;
+  top: 0;
+  /* position: fixed; */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background: #ccc;
+  opacity: 0.5;
+  background: rgba(255, 255, 255, 0.4);
+  color: #409eff;
+}
+
 </style>
